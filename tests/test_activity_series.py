@@ -178,3 +178,19 @@ def test_include_laps_and_events_false(monkeypatch):
     out = _run(monkeypatch, include_laps=False, include_events=False, include_series=False)
     assert "laps" not in out and "events" not in out
     assert out["summary"]["moving_s"] == 3480
+
+
+def test_elapsed_includes_auto_pause(monkeypatch):
+    streams, activity = _ride()
+    # simulate a 300 s auto-pause: drop samples 2000..2299 from every stream
+    for st in streams:
+        st["data"] = st["data"][:2000] + st["data"][2300:]
+
+    async def fake(url, api_key="", params=None, method="GET", data=None):
+        return streams if url.endswith("/streams.json") else activity
+
+    monkeypatch.setattr(activity_series, "make_intervals_request", fake)
+    out = json.loads(asyncio.run(get_activity_series(activity_id="i1", include_series=False)))
+    assert out["summary"]["elapsed_s"] == 3600
+    assert out["summary"]["recorded_s"] == 3300  # the >10 s gap counts as 1 s
+    assert out["source"]["duration_s"] == 3600

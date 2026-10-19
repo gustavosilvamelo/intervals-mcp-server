@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `get_activity_series`: full second-by-second activity series as JSON (adjustable
+  resolution, time window or lap cut) with window summary, per-lap stats and attention
+  events (hr_above_z3, low_cadence, coasting, stop, climb).
 - OAuth 2.0 (authorization code + PKCE) for the HTTP transport. Optional; activates
   only when `MCP_CLIENT_ID` and `MCP_CLIENT_SECRET` are set (`MCP_SERVER_URL` required
   for discovery). stdio transport is unaffected.
