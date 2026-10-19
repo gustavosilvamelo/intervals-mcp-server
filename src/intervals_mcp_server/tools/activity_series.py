@@ -197,7 +197,9 @@ def segment_stats(
     """Stats for a list of 1 Hz samples (a lap, a window or the whole ride)."""
     if not samples:
         return {}
-    elapsed = sum(s["dt"] for s in samples)
+    # wall-clock span (includes auto-pauses); recorded = time actually sampled
+    elapsed = samples[-1]["t"] + samples[-1]["dt"] - samples[0]["t"]
+    recorded = sum(s["dt"] for s in samples)
     mov = [s for s in samples if s["moving"]]
     moving_s = sum(s["dt"] for s in mov)
 
@@ -218,6 +220,7 @@ def segment_stats(
         "start_s": _r(samples[0]["t"], 0),
         "end_s": _r(samples[-1]["t"] + samples[-1]["dt"], 0),
         "elapsed_s": _r(elapsed, 0),
+        "recorded_s": _r(recorded, 0),
         "moving_s": _r(moving_s, 0),
         "distance_m": _r(dist_m, 0),
         "speed_avg_kmh": _r(dist_m / moving_s * 3.6, 1) if dist_m and moving_s else None,
@@ -531,7 +534,8 @@ async def get_activity_series(  # pylint: disable=too-many-arguments,too-many-po
     Returns JSON with:
       - "source": raw points and duration of the activity;
       - "window": the time range and resolution actually returned;
-      - "summary": stats of the window (HR avg/min/max, HR drift, cadence
+      - "summary": stats of the window (elapsed_s = wall-clock incl. pauses,
+        recorded_s = sampled time, HR avg/min/max, HR drift, cadence
         avg/min/max, time below 70 rpm, % coasting, speed, distance,
         elevation gain/loss, grade avg/max, time by grade, time in HR zones);
       - "laps": the same stats for every lap/interval (whole activity);
