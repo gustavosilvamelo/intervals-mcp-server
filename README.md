@@ -62,6 +62,7 @@ Once connected, the following tools are available:
 - `get_activity_details` — Get detailed information for a specific activity
 - `get_activity_intervals` — Get interval data for a specific activity
 - `get_activity_streams` — Get time-series stream data (power, HR, cadence, etc.)
+- `get_activity_series` — Get the full second-by-second series as JSON (adjustable resolution, cut by time window or by lap) with summary, per-lap stats and attention events
 - `get_activity_histogram` — Get a power, heart rate, pace, or gap histogram
 - `get_activity_messages` — Get messages/comments on an activity
 - `add_activity_message` — Add a message/comment to an activity
