@@ -235,6 +235,23 @@ os.environ.setdefault("ATHLETE_ID", "i1")
 - PR description should mention whether `ruff`, `mypy`, and `pytest` passed, and any manual testing steps.
 - Direct commits to `main` are blocked by pre-commit hook.
 
+## Releases and Tags
+
+Claude owns release tagging for this repo.
+
+- `develop` is production: FastMCP Cloud deploys it (`fastmcp.json`). There is no `main` on the remote.
+- Each merge to `develop` that changes tool behaviour is a release. Tag that merge commit
+  `vX.Y.Z` (annotated: `git tag -a vX.Y.Z <merge-sha> -m "vX.Y.Z: <summary>"`) and push the
+  tag (`git push origin vX.Y.Z`).
+- Versioning follows the FastMCP Cloud panel numbering (`v0.0.3`, `v0.0.4`, ...): patch for
+  fixes and new tools, minor for breaking tool changes. `pyproject.toml`'s `version` is the
+  upstream package version and is not bumped per release.
+- Never move or delete a pushed tag; a bad release gets a new patch tag. Older tags stay as
+  rollback points (redeploy the tagged commit from the panel).
+- Every release has a `## [X.Y.Z] - YYYY-MM-DD` section in `CHANGELOG.md`, written in the
+  same PR that the tag will mark.
+- Tag history: `v0.0.3` = `6d2a7c2` (before `get_activity_series`), `v0.0.4` = merge of PR #2.
+
 ---
 
 ## MCP Resource

@@ -7,11 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4] - 2026-10-19
+
 ### Added
 
 - `get_activity_series`: full second-by-second activity series as JSON (adjustable
   resolution, time window or lap cut) with window summary, per-lap stats and attention
   events (hr_above_z3, low_cadence, coasting, stop, climb).
+
+### Fixed
+
+- `get_activity_series`: `elapsed_s` now includes auto-pauses (wall-clock span); the
+  sampled time is reported as `recorded_s`.
+
+## [0.0.3]
+
+Last deployment before `get_activity_series` (commit `6d2a7c2`, tagged retroactively).
+
+### Added
+
 - OAuth 2.0 (authorization code + PKCE) for the HTTP transport. Optional; activates
   only when `MCP_CLIENT_ID` and `MCP_CLIENT_SECRET` are set (`MCP_SERVER_URL` required
   for discovery). stdio transport is unaffected.
