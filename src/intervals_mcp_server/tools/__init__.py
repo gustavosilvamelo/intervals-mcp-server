@@ -34,6 +34,7 @@ from intervals_mcp_server.tools.activity_analysis import (  # noqa: F401
     get_activity_time_at_hr,
     get_activity_weather_summary,
 )
+from intervals_mcp_server.tools.activity_series import get_activity_series  # noqa: F401
 from intervals_mcp_server.tools.activity_intervals import (  # noqa: F401
     delete_activity_intervals,
     split_activity_interval,
@@ -121,6 +122,8 @@ __all__ = [
     "get_activity_power_vs_hr",
     "get_activity_hr_load_model",
     "get_activity_power_spike_model",
+    # Activity series (second by second)
+    "get_activity_series",
     # Activity interval editing
     "update_activity_intervals",
     "update_activity_interval",
