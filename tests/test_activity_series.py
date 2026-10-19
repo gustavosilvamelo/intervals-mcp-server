@@ -159,3 +159,22 @@ def test_no_streams(monkeypatch):
 def test_bad_lap(monkeypatch):
     out = _run(monkeypatch, lap=9)
     assert "Lap 9 not found" in out["error"]
+
+
+def test_default_resolution_buckets(monkeypatch):
+    out = _run(monkeypatch)  # resolution_s defaults to 10
+    assert out["window"]["resolution_s"] == 10
+    assert len(out["series"]["data"]) == 360
+    assert [row[0] for row in out["series"]["data"][:3]] == [0, 10, 20]
+
+
+def test_include_series_false_omits_series(monkeypatch):
+    out = _run(monkeypatch, include_series=False)
+    assert "series" not in out
+    assert {"summary", "laps", "events"} <= out.keys()
+
+
+def test_include_laps_and_events_false(monkeypatch):
+    out = _run(monkeypatch, include_laps=False, include_events=False, include_series=False)
+    assert "laps" not in out and "events" not in out
+    assert out["summary"]["moving_s"] == 3480
