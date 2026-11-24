@@ -64,7 +64,7 @@ from intervals_mcp_server.tools.training_plan import (  # noqa: F401
     change_training_plan,
     get_training_plan,
 )
-from intervals_mcp_server.tools.wellness import get_wellness_data  # noqa: F401
+from intervals_mcp_server.tools.wellness import get_wellness_data, update_wellness_data  # noqa: F401
 from intervals_mcp_server.tools.workout_library import (  # noqa: F401
     get_workout_folders,
     list_workouts,
@@ -138,6 +138,7 @@ __all__ = [
     "add_or_update_event",
     # Other
     "get_wellness_data",
+    "update_wellness_data",
     "get_athlete_zones",
     "get_training_summary",
     # Training plans

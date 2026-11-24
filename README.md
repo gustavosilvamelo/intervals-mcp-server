@@ -84,6 +84,7 @@ Once connected, the following tools are available:
 
 **Wellness & Training**
 - `get_wellness_data` — Fetch wellness data
+- `update_wellness_data` — Record wellness values for a day (weight, sleep, resting HR, HRV, questionnaire); never overwrites a filled value unless `overwrite=True`
 - `get_training_summary` — Get a training load summary
 - `get_athlete_power_curves` — Get best power output curves for selected durations and time periods
 - `get_athlete_zones` — Get athlete training zones (power, HR, pace, etc.)
