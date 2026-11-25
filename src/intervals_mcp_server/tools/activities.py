@@ -498,7 +498,8 @@ async def update_activity(
         activity_id: The Intervals.icu activity ID
         fields: Dictionary of activity fields to update. Common fields include:
                 name (str), description (str), type (str), trainer (bool), commute (bool),
-                tags (list[str]), gear_id (str), start_date_local (ISO datetime str).
+                tags (list[str]), gear_id (str), start_date_local (ISO datetime str),
+                icu_rpe (int, 1-10 perceived exertion), feel (int, 1-5 feel score).
                 Only the provided fields are updated.
         api_key: The Intervals.icu API key (optional, will use API_KEY from .env if not provided)
     """

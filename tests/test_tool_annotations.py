@@ -71,6 +71,11 @@ EXPECTED_ANNOTATIONS = {
         "readOnlyHint": True,
         "destructiveHint": False,
     },
+    "update_wellness_data": {
+        "title": "Update Wellness Data",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+    },
     "get_custom_items": {
         "title": "Get Custom Items",
         "readOnlyHint": True,
