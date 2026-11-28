@@ -17,6 +17,7 @@ from intervals_mcp_server.utils.formatting import (
     format_event_compact,
     format_event_details,
     format_event_summary,
+    format_workout_steps,
 )
 from intervals_mcp_server.utils.types import WorkoutDoc
 from intervals_mcp_server.utils.validation import (
@@ -289,6 +290,7 @@ async def get_event_by_id(
     event_id: str,
     athlete_id: str = "",
     api_key: str = "",
+    include_workout_steps: bool = False,
 ) -> str:
     """Get detailed information for a specific event from Intervals.icu
 
@@ -296,15 +298,19 @@ async def get_event_by_id(
         event_id: The Intervals.icu event ID
         athlete_id: The Intervals.icu athlete ID (optional, will use ATHLETE_ID from .env if not provided)
         api_key: The Intervals.icu API key (optional, will use API_KEY from .env if not provided)
+        include_workout_steps: When true, also return the structured steps of the planned workout
+            (duration, repetitions and power, cadence and heart-rate targets of each step, with
+            percent-of-FTP targets also converted to watts). Default false: same output as before.
     """
     # Resolve athlete ID
     athlete_id_to_use, error_msg = resolve_athlete_id(athlete_id, config.athlete_id)
     if error_msg:
         return error_msg
 
-    # Call the Intervals.icu API
+    # Call the Intervals.icu API (resolve=true only when the steps were asked for)
+    params = {"resolve": "true"} if include_workout_steps else None
     result = await make_intervals_request(
-        url=f"/athlete/{athlete_id_to_use}/events/{event_id}", api_key=api_key
+        url=f"/athlete/{athlete_id_to_use}/events/{event_id}", api_key=api_key, params=params
     )
 
     if isinstance(result, dict) and "error" in result:
@@ -318,7 +324,11 @@ async def get_event_by_id(
     if not isinstance(result, dict):
         return f"Invalid event format for event {event_id}."
 
-    return format_event_details(result)
+    details = format_event_details(result)
+    if include_workout_steps:
+        steps = format_workout_steps(result.get("workout_doc"))
+        details += "\n\n" + (steps or "Workout steps: none (the event has no structured steps).")
+    return details
 
 
 @mcp.tool(
