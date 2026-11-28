@@ -726,6 +726,85 @@ Calendar: {cal.get("name", "N/A")}"""
     return event_details
 
 
+_STEP_VALUE_KEYS = ("value", "start", "end", "units")
+
+
+def _step_value(raw: Any) -> dict[str, Any] | None:
+    """Keep only the plain fields of a step target (power, cadence, hr), or None when empty."""
+    if not isinstance(raw, dict):
+        return None
+    out = {k: raw[k] for k in _STEP_VALUE_KEYS if raw.get(k) is not None}
+    return out or None
+
+
+def _flatten_steps(
+    steps: list[Any],
+    counter: list[int],
+    group: int | None = None,
+    rep: int | None = None,
+    reps: int | None = None,
+) -> list[dict[str, Any]]:
+    """Expand nested repeat blocks into one entry per executed step, in workout order."""
+    flat: list[dict[str, Any]] = []
+    for step in steps:
+        if not isinstance(step, dict):
+            continue
+        children = step.get("steps")
+        if isinstance(children, list) and children:
+            times = step.get("reps")
+            times = times if isinstance(times, int) and times > 0 else 1
+            counter[1] += 1
+            this_group = counter[1]
+            for i in range(1, times + 1):
+                flat.extend(_flatten_steps(children, counter, this_group, i, times))
+            continue
+        counter[0] += 1
+        entry: dict[str, Any] = {"n": counter[0]}
+        if group is not None:
+            entry.update({"group": group, "rep": rep, "reps": reps})
+        for key in ("text", "duration", "distance"):
+            if step.get(key) is not None:
+                entry["duration_s" if key == "duration" else key] = step[key]
+        for key in ("warmup", "cooldown", "ramp", "freeride", "maxeffort", "until_lap_press"):
+            if step.get(key):
+                entry[key] = True
+        for key, raw_key in (
+            ("power", "power"),
+            ("power_resolved", "_power"),
+            ("cadence", "cadence"),
+            ("hr", "hr"),
+            ("hr_resolved", "_hr"),
+        ):
+            value = _step_value(step.get(raw_key))
+            if value:
+                entry[key] = value
+        flat.append(entry)
+    return flat
+
+
+def format_workout_steps(workout_doc: Any) -> str:
+    """Format the structured steps of a planned workout (workout_doc) as a JSON block.
+
+    Repeat blocks are expanded (one entry per repetition). Targets are exactly as stored by
+    Intervals.icu (percent of FTP, ranges, cadence); *_resolved holds the watts/bpm when the
+    request was made with resolve=true. Returns an empty string when there are no steps.
+    """
+    if not isinstance(workout_doc, dict) or not isinstance(workout_doc.get("steps"), list):
+        return ""
+    flat = _flatten_steps(workout_doc["steps"], [0, 0])
+    if not flat:
+        return ""
+    extra = {
+        k: workout_doc[k]
+        for k in ("duration", "ftp", "lthr", "target")
+        if workout_doc.get(k) is not None
+    }
+    payload = {"steps": flat, **({"workout": extra} if extra else {})}
+    return "Workout steps (structured, one entry per executed step):\n" + json.dumps(
+        payload, ensure_ascii=False
+    )
+
+
 def format_activity_message(message: dict[str, Any]) -> str:
     """Format an activity message/note into a readable string."""
     created = message.get("created", "Unknown")

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `get_event_by_id`: new optional `include_workout_steps` (default false). When true, also returns
+  the structured steps of the planned workout (repeats expanded; duration, power, cadence and
+  heart-rate targets of each step, with %FTP also in watts via `resolve=true`). Without it the
+  output is unchanged.
 - `get_activity_series`: full second-by-second activity series as JSON (adjustable
   resolution, time window or lap cut) with window summary, per-lap stats and attention
   events (hr_above_z3, low_cadence, coasting, stop, climb).
